@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Music</title>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: serif;
+        }
+        /* Nút nhạc */
+        
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            color: black;
+            border-radius: 50px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+        /* Icon */
+        
+        #musicIcon {
+            font-size: 22px;
+            cursor: pointer;
+        }
+        /* Volume */
+        
+        input[type=range] {
+            width: 80px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>💍 Thiệp Cưới Online</h1>
+
+    <!-- Nhạc -->
+    <audio id="bgMusic" loop>
+    <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+    <!-- Điều khiển -->
+    <div class="music-control">
+        <span id="musicIcon">🔇</span>
+        <input type="range" id="volumeControl" min="0" max="1" step="0.05" value="0.5">
+    </div>
+
+    <script>
+        const music = document.getElementById("bgMusic");
+        const icon = document.getElementById("musicIcon");
+        const volumeControl = document.getElementById("volumeControl");
+
+        // ===== CÀI ĐẶT BAN ĐẦU =====
+        music.volume = 0.5;
+
+        // ===== FADE IN =====
+        function fadeIn() {
+            music.volume = 0;
+            let vol = 0;
+            music.play();
+            let fade = setInterval(() => {
+                if (vol < 0.5) {
+                    vol += 0.05;
+                    music.volume = vol;
+                } else {
+                    clearInterval(fade);
+                }
+            }, 200);
+        }
+
+        // ===== FADE OUT =====
+        function fadeOut() {
+            let vol = music.volume;
+            let fade = setInterval(() => {
+                if (vol > 0) {
+                    vol -= 0.05;
+                    music.volume = vol;
+                } else {
+                    music.pause();
+                    clearInterval(fade);
+                }
+            }, 200);
+        }
+
+        // ===== BẬT NHẠC SAU KHI CHẠM MÀN HÌNH =====
+        document.addEventListener("click", function startMusicOnce() {
+            if (!music.playing) {
+                fadeIn();
+                icon.textContent = "🎵";
+                localStorage.setItem("musicState", "on");
+            }
+            document.removeEventListener("click", startMusicOnce);
+        });
+
+        // ===== NÚT BẬT TẮT =====
+        icon.addEventListener("click", () => {
+            if (music.paused) {
+                fadeIn();
+                icon.textContent = "🎵";
+                localStorage.setItem("musicState", "on");
+            } else {
+                fadeOut();
+                icon.textContent = "🔇";
+                localStorage.setItem("musicState", "off");
+            }
+        });
+
+        // ===== VOLUME =====
+        volumeControl.addEventListener("input", () => {
+            music.volume = volumeControl.value;
+        });
+
+        // ===== NHỚ TRẠNG THÁI =====
+        window.addEventListener("load", () => {
+            if (localStorage.getItem("musicState") === "on") {
+                fadeIn();
+                icon.textContent = "🎵";
+            }
+        });
+    </script>
+
+</body>
+
+</html>
